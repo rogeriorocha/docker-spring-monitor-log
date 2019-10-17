@@ -19,7 +19,7 @@ public class TestController {
 		// info(String.format("id=[%s] firstname=[%d] surname=[%s]", user.getId(),
 		// user.getFirstname(), user.getSurname()));
 
-		logger.info(String.format("name=[%s] acao=[%s]", name, "XPTO"));
+		logger.info("RPSR");
 
 		return "Hello " + name + "!!";
 	}

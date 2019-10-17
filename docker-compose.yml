@@ -3,6 +3,10 @@ version: '2'
 services:
   app:
     build: .
+    labels:
+      filebeat_enable:
+    networks:
+      - helloworld
     ports:
       - "8080:8080"
     links:
@@ -11,6 +15,8 @@ services:
   elasticsearch:
     build: elk/elasticsearch/
     container_name: elasticsearch
+    networks:
+      - helloworld
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -21,21 +27,44 @@ services:
     build: elk/logstash/
     container_name: logstash
     command: -f /etc/logstash/conf.d/
+    networks:
+      - helloworld
     volumes:
       - ./elk/logstash/config:/etc/logstash/conf.d
     ports:
-      - "9999:9999"
+    #  - "9999:9999"
       - "31311:31311"
+      - "5044:5044"
     links:
       - elasticsearch
 
   kibana:
     build: elk/kibana/
     container_name: kibana
+    networks:
+      - helloworld
     volumes:
       - ./elk/kibana/config/:/opt/kibana/config/
     ports:
       - "5601:5601"
     links:
       - elasticsearch
+
+  filebeat:
+    build: elk/filebeat
+    links:
+      - app
+      - logstash
+      - elasticsearch
+    networks:
+      - helloworld
+    volumes:
+      # needed to access all docker logs :
+      - "/var/lib/docker/containers:/var/lib/docker/containers"
+      # needed to access additional information about containers
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+networks:
+  helloworld:
+    driver: "bridge"
 
