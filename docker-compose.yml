@@ -1,4 +1,4 @@
-version: '2'
+version: '3.3'
 
 services:
   app:
@@ -12,6 +12,13 @@ services:
     links:
       - logstash
 
+    healthcheck:
+      test: ["CMD", "curl", "-fail", "http://localhost:8080"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+        
+
   elasticsearch:
     build: elk/elasticsearch/
     container_name: elasticsearch
@@ -24,7 +31,6 @@ services:
       ES_JAVA_OPTS: "-Xms1g -Xmx1g"
     labels:
       org.label-schema.group: "logging"
-
       
   logstash:
     build: elk/logstash/
@@ -42,7 +48,6 @@ services:
       - elasticsearch
     labels:
       org.label-schema.group: "logging"
-
 
   kibana:
     build: elk/kibana/
@@ -71,10 +76,10 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     labels:
       org.label-schema.group: "logging"
-                         
+                      
 
   prometheus:
-          #build: monitor/prometheus
+    #build: monitor/prometheus
     image:  prom/prometheus
     volumes:
       - ./monitor/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
