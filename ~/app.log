@@ -1,6 +1,0 @@
-logdate=(2019-10-15T20:19:15,912) thread=(main))
-			level=(INFO) loggerclass=(br.gov.mg.bdmg.pocservice.PocServiceApplicationTests) message=(Starting PocServiceApplicationTests on d16bff5c62e2 with PID 57 (started by root in /usr/src/mymaven))
-logdate=(2019-10-15T20:19:15,929) thread=(main))
-			level=(INFO) loggerclass=(br.gov.mg.bdmg.pocservice.PocServiceApplicationTests) message=(No active profile set, falling back to default profiles: default)
-logdate=(2019-10-15T20:19:17,963) thread=(main))
-			level=(INFO) loggerclass=(br.gov.mg.bdmg.pocservice.PocServiceApplicationTests) message=(Started PocServiceApplicationTests in 2.418 seconds (JVM running for 3.558))
