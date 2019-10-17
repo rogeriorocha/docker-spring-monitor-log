@@ -17,8 +17,8 @@ scrape_configs:
     static_configs:
     - targets: ['127.0.0.1:9090']
 
-  - job_name: 'spring-actuator'
+  - job_name: 'app-spring-actuator'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
-    - targets: ['HOST_IP:8080']
+    - targets: ['app:8080']

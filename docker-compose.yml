@@ -22,6 +22,9 @@ services:
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    labels:
+      org.label-schema.group: "logging"
+
       
   logstash:
     build: elk/logstash/
@@ -37,6 +40,9 @@ services:
       - "5044:5044"
     links:
       - elasticsearch
+    labels:
+      org.label-schema.group: "logging"
+
 
   kibana:
     build: elk/kibana/
@@ -63,6 +69,38 @@ services:
       - "/var/lib/docker/containers:/var/lib/docker/containers"
       # needed to access additional information about containers
       - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      org.label-schema.group: "logging"
+                         
+
+  prometheus:
+          #build: monitor/prometheus
+    image:  prom/prometheus
+    volumes:
+      - ./monitor/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    links:
+      - app        
+    networks:
+      - helloworld
+    ports:
+      - "9090:9090"
+    labels:
+      org.label-schema.group: "monitoring"        
+  
+  grafana:
+    image:  grafana/grafana
+
+    links:
+      - prometheus
+    networks:
+      - helloworld
+    ports:
+      - "3000:3000"
+    labels:
+      org.label-schema.group: "monitoring"        
+    
 
 networks:
   helloworld:
