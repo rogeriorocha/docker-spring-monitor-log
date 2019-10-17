@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.StringMapMessage;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,13 @@ public class TestController {
 
 		// info(String.format("id=[%s] firstname=[%d] surname=[%s]", user.getId(),
 		// user.getFirstname(), user.getSurname()));
+		//
+		//
+
+		logger.info(new StringMapMessage()
+								.with("id",1)
+												.with("firstname", "ROGERIO")
+																);
 
 		logger.info("RPSR");
 

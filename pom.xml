@@ -38,6 +38,13 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.vlkan.log4j2/log4j2-logstash-layout -->
+		<dependency>
+				<groupId>com.vlkan.log4j2</groupId>
+					<artifactId>log4j2-logstash-layout</artifactId>
+						<version>0.21</version>
+						</dependency>		
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
