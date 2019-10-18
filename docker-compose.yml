@@ -6,7 +6,7 @@ services:
     labels:
       filebeat_enable:
     networks:
-      - helloworld
+      - backend 
     ports:
       - "8080:8080"
     links:
@@ -23,7 +23,7 @@ services:
     build: elk/elasticsearch/
     container_name: elasticsearch
     networks:
-      - helloworld
+      - backend
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -37,7 +37,7 @@ services:
     container_name: logstash
     command: -f /etc/logstash/conf.d/
     networks:
-      - helloworld
+      - backend
     volumes:
       - ./elk/logstash/config:/etc/logstash/conf.d
     ports:
@@ -53,7 +53,7 @@ services:
     build: elk/kibana/
     container_name: kibana
     networks:
-      - helloworld
+      - backend
     volumes:
       - ./elk/kibana/config/:/opt/kibana/config/
     ports:
@@ -68,7 +68,7 @@ services:
       - logstash
       - elasticsearch
     networks:
-      - helloworld
+      - backend
     volumes:
       # needed to access all docker logs :
       - "/var/lib/docker/containers:/var/lib/docker/containers"
@@ -88,7 +88,7 @@ services:
     links:
       - app        
     networks:
-      - helloworld
+      - backend
     ports:
       - "9090:9090"
     labels:
@@ -100,7 +100,7 @@ services:
     links:
       - prometheus
     networks:
-      - helloworld
+      - backend
     ports:
       - "3000:3000"
     labels:
@@ -108,6 +108,6 @@ services:
     
 
 networks:
-  helloworld:
+  backend:
     driver: "bridge"
 
