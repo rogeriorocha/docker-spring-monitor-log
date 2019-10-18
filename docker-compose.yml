@@ -13,7 +13,7 @@ services:
       - logstash
 
     healthcheck:
-      test: ["CMD", "curl", "-fail", "http://localhost:8080"]
+      test: ["CMD", "curl", "-fail", "http://localhost:8080/healthcheck"]
       interval: 10s
       timeout: 10s
       retries: 30

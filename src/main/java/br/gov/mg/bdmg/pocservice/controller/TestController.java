@@ -1,5 +1,6 @@
 package br.gov.mg.bdmg.pocservice.controller;
 
+import java.io.File;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 	private final Logger logger = LogManager.getLogger(this.getClass());
+	
+
+	@GetMapping("/healthcheck")
+	public String healthcheck() throws Exception {
+		
+		if (new File("/tmp/error.txt").exists())
+			throw new Exception("/tmp/error.txt exists");
+		
+		return "OK";
+	}
+	
 
 	@GetMapping("/")
 	public String sayHello(@RequestParam(value = "name", defaultValue = "Guest") String name) {
