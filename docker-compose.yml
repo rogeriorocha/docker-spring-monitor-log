@@ -16,7 +16,7 @@ services:
       test: ["CMD", "curl", "-fail", "http://localhost:8080/healthcheck"]
       interval: 10s
       timeout: 10s
-      retries: 30
+      retries: 3
         
 
   elasticsearch:
