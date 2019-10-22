@@ -11,10 +11,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.StringMapMessage;
 import org.dom4j.DocumentException;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,9 @@ import br.gov.mg.bdmg.fsservice.util.base.FileUtilConstants.Util;
 
 @Service
 public class FSService {
-	private Logger LOGGER = Logger.getLogger(FSService.class.getName());
+	
+	private final Logger LOGGER = LogManager.getLogger(this.getClass());
+
 
 	private static final String IOEXCEPTION = "[IOEXCEPTION] ";
 	private static final String EXCEPTION = "[EXCEPTION] ";
@@ -96,6 +99,9 @@ public class FSService {
 			}
 			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
 		} catch (Throwable e) {
+			
+			LOGGER.error(new StringMapMessage().with("error", e.getMessage()));
+					
 			if (arquivoDado != null) {
 				arquivoDadoService.delete(arquivoDado);
 			}
@@ -154,19 +160,16 @@ public class FSService {
 			fileTmp.delete();
 
 		} catch (FileNotFoundException e) {
-
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-
+			LOGGER.error(new StringMapMessage().with("error", FILENOTFOUNDEXCEPTION + e.getMessage()));
 			throw new FileServiceException(FILENOTFOUNDEXCEPTION + e.getMessage(), e);
 		} catch (IOException e) {
-
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(new StringMapMessage().with("error", IOEXCEPTION + e.getMessage()));
 			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
 		} catch (ServiceException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(new StringMapMessage().with("error", STOREEXCEPTION + e.getMessage()));
 			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(new StringMapMessage().with("error", EXCEPTION + e.getMessage()));
 			throw new FileServiceException(EXCEPTION + e.getMessage(), e);
 		}
 
@@ -236,16 +239,17 @@ public class FSService {
 			unionFileTmp.delete();
 
 		} catch (FileNotFoundException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			
+			LOGGER.error(new StringMapMessage().with("error", FILENOTFOUNDEXCEPTION + e.getMessage()));
 			throw new FileServiceException(FILENOTFOUNDEXCEPTION + e.getMessage(), e);
 		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(new StringMapMessage().with("error", IOEXCEPTION + e.getMessage()));
 			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
 		} catch (ServiceException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(new StringMapMessage().with("error", STOREEXCEPTION + e.getMessage()));
 			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
 		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			LOGGER.error(new StringMapMessage().with("error", EXCEPTION + e.getMessage()));
 			throw new FileServiceException(EXCEPTION + e.getMessage(), e);
 		}
 
@@ -267,6 +271,7 @@ public class FSService {
 				localFiles.add(file.getAbsolutePath());
 			}
 		} catch (IOException e) {
+			LOGGER.error(new StringMapMessage().with("error", "Codigo Arquivo não encontrado: " + id + " "+e.getMessage() ));
 			throw new IOException("Codigo Arquivo não encontrado: " + id);
 		}
 		return localFiles;

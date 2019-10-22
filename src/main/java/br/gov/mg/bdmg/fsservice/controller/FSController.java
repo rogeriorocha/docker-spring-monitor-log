@@ -108,8 +108,9 @@ public class FSController {
 	// String paramCodigoUsuario
 	) throws FileServiceException, IOException {
 
-		LOGGER.info(new StringMapMessage().with("method", "uploadFile").with("categoria", paramCategoria)
-				.with("descricao", descricao));
+		
+		LOGGER.info(new StringMapMessage().with("method", "uploadFile").with("categoria", StringUtil.ifNullEmpty(paramCategoria))
+				.with("descricao", StringUtil.ifNullEmpty(descricao)));
 
 		ParamDTO paramTO = new ParamDTO();
 
@@ -145,7 +146,7 @@ public class FSController {
 	@GetMapping("/union")
 	@ApiOperation("Unir arquivos PDFs")
 	public ResponseEntity<?> unionPDFs(@RequestParam("pdfs") String pdfs, @RequestParam("filename") String filename) {
-		LOGGER.info(new StringMapMessage().with("method", "unionPDFs").with("pdfs", pdfs).with("filename", filename));
+		LOGGER.info(new StringMapMessage().with("method", "unionPDFs").with("pdfs", pdfs).with("filename", StringUtil.ifNullEmpty(filename)));
 		try {
 			ParamDTO paramTO = ParamDTO.builder().setPdf(pdfs.trim()).setFilename(filename);
 
@@ -163,7 +164,7 @@ public class FSController {
 	public ResponseEntity<?> watermark(@RequestParam(name = "codArq") String arquivo,
 			@RequestParam(name = "texto") String texto,
 			@RequestParam(name = "filename", defaultValue = "") String filename) {
-		LOGGER.info(new StringMapMessage().with("method", "watermark").with("texto", texto).with("filename", filename));
+		LOGGER.info(new StringMapMessage().with("method", "watermark").with("texto", texto).with("filename", StringUtil.ifNullEmpty(filename)));
 		try {
 			Long codArq = Long.valueOf(arquivo);
 			ParamDTO paramTO = ParamDTO.builder().setId(codArq).setTexto(texto).setFilename(filename)
