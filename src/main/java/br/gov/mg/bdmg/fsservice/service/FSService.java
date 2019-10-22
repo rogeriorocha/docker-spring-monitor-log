@@ -79,6 +79,7 @@ public class FSService {
 
 			id = arquivoDado.getId();
 
+			LOGGER.trace("appProperties.getStorage()Location", appProperties.getStorage().getLocation());
 			PathUtil file = new PathUtil(id, appProperties.getStorage().getLocation());
 
 			File fileToSave = file.getFile(true);
@@ -100,7 +101,7 @@ public class FSService {
 			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
 		} catch (Throwable e) {
 			
-			LOGGER.error(new StringMapMessage().with("error", e.getMessage()));
+			LOGGER.error(e.getMessage());
 					
 			if (arquivoDado != null) {
 				arquivoDadoService.delete(arquivoDado);
