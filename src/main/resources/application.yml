@@ -7,6 +7,10 @@ spring.security.user:
   name: actuator
   password: actuator
   roles: ACTUATOR_ADMIN
+  
+spring:
+  profiles:
+    active: "dev"  
 
 # SHUTDOWN ENDPOINT (ShutdownEndpoint)
 management.endpoint: 
@@ -14,6 +18,8 @@ management.endpoint:
 # HEALTH ENDPOINT
   health.show-details: always
 # ENDPOINTS WEB CONFIGURATION
+
+
 
 --- 
 spring:
