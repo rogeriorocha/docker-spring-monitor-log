@@ -14,8 +14,11 @@ services:
       - logstash
     environment:
        SPRING_APPLICATION_JSON: '{
-        "spring.profile.active" : "docker",
-        "spring.datasource.url": "jdbc:mysql://db:3306/table",
+        "spring.profiles.active" : "docker",
+        "spring.datasource.username": "sist_controle",
+        "spring.datasource.password": "Ho1#h=j4",
+        "spring.datasource.driverClassName": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+        "spring.datasource.url": "jdbc:sqlserver://desesqlbdmg:2002;databaseName=bdseg"
       }'      
     volumes:
       - ./data/app/store:/store      
