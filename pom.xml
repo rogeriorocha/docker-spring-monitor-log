@@ -12,6 +12,8 @@
 	<groupId>br.gov.mg.bdmg</groupId>
 	<artifactId>fs-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	
+	<packaging>jar</packaging>
 	<name>fs-service</name>
 	<description>File Service</description>
 
