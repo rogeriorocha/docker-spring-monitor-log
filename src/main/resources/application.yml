@@ -26,6 +26,13 @@ spring:
     password: Ho1#h=j4
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
-    show-sql: true      
+    show-sql: true
+          
+  servlet:
+    multipart:
+      max-file-size: 100MB 
+      max-request-size: 100MB
+      enabled: true
 
-    
+app:
+  storage.location: /temp/store

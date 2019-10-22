@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.gov.mg.bdmg.fsservice.exception.StorageException;
 import br.gov.mg.bdmg.fsservice.exception.StorageFileNotFoundException;
-import br.gov.mg.bdmg.fsservice.storage.StorageProperties;
+import br.gov.mg.bdmg.fsservice.storage.AppProperties;
 import br.gov.mg.bdmg.fsservice.storage.StorageService;
 
 @Service
@@ -28,8 +28,8 @@ public class FileSystemStorageService implements StorageService {
 	private final Path rootLocation;
 
 	@Autowired
-	public FileSystemStorageService(StorageProperties properties) {
-		this.rootLocation = Paths.get(properties.getLocation());
+	public FileSystemStorageService(AppProperties properties) {
+		this.rootLocation = Paths.get(properties.getStorage().getLocation());
 	}
 
 	@Override

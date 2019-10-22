@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import javax.security.auth.login.AppConfigurationEntry;
+
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,9 @@ import br.gov.mg.bdmg.fsservice.dto.ParamDTO;
 import br.gov.mg.bdmg.fsservice.exception.FileServiceException;
 import br.gov.mg.bdmg.fsservice.model.ArquivoDado;
 import br.gov.mg.bdmg.fsservice.repository.ArquivoDadoRepository;
+import br.gov.mg.bdmg.fsservice.storage.AppProperties;
+import br.gov.mg.bdmg.fsservice.util.FileUtil;
+import br.gov.mg.bdmg.fsservice.util.PathUtil;
 
 @Service
 public class FSService {
@@ -37,55 +42,59 @@ public class FSService {
 
 	@Autowired
 	ArquivoDadoRepository arquivoDadoService;
+	
+	
+	@Autowired
+	AppProperties appProperties;
 
 	public Long uploadFile(ParamDTO paramTO) throws FileServiceException, IOException {
 		LOGGER.info("Class: FileServiceBean Method: uploadFile");
 
-//		RPSR
-//		ArquivoDado arquivoDadoTemp = null;
-//		ArquivoDado arquivoDado = null;
-//		Long id = null;
-//
-//		try {
-//			Long codigoUsuarioIncl = null;
-//			if (!paramTO.getUsuario().isEmpty())
-//				codigoUsuarioIncl = Long.valueOf(paramTO.getUsuario());
-//
-//			arquivoDadoTemp = ArquivoDado.builder().setFlagMigr(ArquivoDado.Flags.MIGR)
-//					.setAtivo(ArquivoDado.Flags.ATIVO).setCodigoUsuarioIncl(codigoUsuarioIncl).setCodigoCategoria(
-//							paramTO.getCodigoCategoria() == null ? CODIGO_DEFAULT : paramTO.getCodigoCategoria());
-//
-//			arquivoDado = arquivoDadoService.save(arquivoDadoTemp);
-//
-//			id = arquivoDado.getId();
-//
-//			PathUtil file = new PathUtil(id);
-//
-//			File fileToSave = file.getFile(true);
-//
-//			String repHash = PathUtil.saveFile(paramTO.getDadosTO().getInputStream(), fileToSave);
-//
-//			arquivoDado.setTamanhoArquivo(fileToSave.length()).setHash(repHash).setDataIncl(new Date())
-//					.setNomeOrigem(paramTO.getDadosTO().getFileName())
-//					// .setCodigoUsuarioIncl(getNameUserFile(paramTO.getDadosFileTO().getUsuario()))
-//					.setDescricaoArquivo(paramTO.getDescricao()).setId(id).setEnderecoArquivo(fileToSave.getPath());
-//
-//			arquivoDadoService.save(arquivoDado);
-//
-//		} catch (IOException e) {
-//
-//			if (arquivoDado != null) {
-//				arquivoDadoService.delete(arquivoDado);
-//			}
-//			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
-//		} catch (Throwable e) {
-//			if (arquivoDado != null) {
-//				arquivoDadoService.delete(arquivoDado);
-//			}
-//			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
-//		}
-//		return id;
-		return Long.valueOf(1);
+
+		ArquivoDado arquivoDadoTemp = null;
+		ArquivoDado arquivoDado = null;
+		Long id = null;
+
+		try {
+			Long codigoUsuarioIncl = null;
+			if (!paramTO.getUsuario().isEmpty())
+				codigoUsuarioIncl = Long.valueOf(paramTO.getUsuario());
+
+			arquivoDadoTemp = ArquivoDado.builder().setFlagMigr(ArquivoDado.Flags.MIGR)
+					.setAtivo(ArquivoDado.Flags.ATIVO).setCodigoUsuarioIncl(codigoUsuarioIncl).setCodigoCategoria(
+							paramTO.getCodigoCategoria() == null ? CODIGO_DEFAULT : paramTO.getCodigoCategoria());
+
+			arquivoDado = arquivoDadoService.save(arquivoDadoTemp);
+
+			id = arquivoDado.getId();
+
+			PathUtil file = new PathUtil(id, appProperties.getStorage().getLocation());
+
+			File fileToSave = file.getFile(true);
+
+			String repHash = PathUtil.saveFile(paramTO.getDadosTO().getInputStream(), fileToSave);
+
+			arquivoDado.setTamanhoArquivo(fileToSave.length()).setHash(repHash).setDataIncl(new Date())
+					.setNomeOrigem(paramTO.getDadosTO().getFileName())
+					// .setCodigoUsuarioIncl(getNameUserFile(paramTO.getDadosFileTO().getUsuario()))
+					.setDescricaoArquivo(paramTO.getDescricao()).setId(id).setEnderecoArquivo(fileToSave.getPath());
+
+			arquivoDadoService.save(arquivoDado);
+
+		} catch (IOException e) {
+
+			if (arquivoDado != null) {
+				arquivoDadoService.delete(arquivoDado);
+			}
+			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
+		} catch (Throwable e) {
+			if (arquivoDado != null) {
+				arquivoDadoService.delete(arquivoDado);
+			}
+			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
+		}
+		return id;
+		
 	}
 
 	/**
@@ -266,9 +275,10 @@ public class FSService {
 	}
 
 	public byte[] download(ArquivoDado arquivoDado, String fromEncode, String toEncode) throws IOException {
-		
-		
+
 		return null;
+		
+		
 	}
 
 	public long expurgar() {
