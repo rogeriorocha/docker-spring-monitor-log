@@ -20,7 +20,7 @@ docker run -it --rm  \
    -v "$PWD/target:/usr/src/mymaven/target" \
    -w /usr/src/mymaven maven mvn package 
 
-docker build -t rogeriosilvarocha/po-service:latest .
+docker build -t rogeriosilvarocha/fs-service:latest .
 
 
 docker inspect --format='{{json .State.Health}}' 8f348ca3b31a
