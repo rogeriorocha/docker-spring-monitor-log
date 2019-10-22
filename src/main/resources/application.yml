@@ -1,0 +1,38 @@
+# Logging
+logging:
+  file: app.log
+
+# Spring Security default user name and password
+spring.security.user:
+  name: actuator
+  password: actuator
+  roles: ACTUATOR_ADMIN
+
+# SHUTDOWN ENDPOINT (ShutdownEndpoint)
+management.endpoint: 
+  shutdown.enabled: true
+# HEALTH ENDPOINT
+  health.show-details: always
+# ENDPOINTS WEB CONFIGURATION
+
+--- 
+spring:
+  profiles: dev
+  banner:
+    location: banner-dev.txt 
+  datasource:
+    url: jdbc:sqlserver://desesqlbdmg:2002;databaseName=bdseg
+    username: sist_rpsr
+    password: Ho1#h=j4
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+          
+  servlet:
+    multipart:
+      max-file-size: 100MB 
+      max-request-size: 100MB
+      enabled: true
+
+app:
+  storage.location: /temp/store
