@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,8 +50,7 @@ public class FSController {
 			@RequestParam(name = "compactar", required = false, defaultValue = "N") String compactar)
 			throws IOException, FileUtilException {
 
-		LOGGER.info(new StringMapMessage().with("method", "downloadFile")
-				.with("id", id)
+		LOGGER.info(new StringMapMessage().with("method", "downloadFile").with("id", id)
 				.with("fromEncode", StringUtil.ifNullEmpty(fromEncode))
 				.with("toEncode", StringUtil.ifNullEmpty(toEncode))
 				.with("filename", StringUtil.ifNullEmpty(filenameSet))
@@ -103,13 +103,12 @@ public class FSController {
 	public Map<String, Object> uploadFile(
 			@RequestParam(name = "categoria", required = false, defaultValue = "") String paramCategoria,
 			@RequestParam(name = "descricao", required = false) String descricao,
-			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes
-	// ,RequestHeader(value = "x-coduser", required = false, defaultValue = "")
-	// String paramCodigoUsuario
-	) throws FileServiceException, IOException {
+			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
+			@RequestHeader(value = "x-coduser", required = false, defaultValue = "") String paramCodigoUsuario)
+			throws FileServiceException, IOException {
 
-		
-		LOGGER.info(new StringMapMessage().with("method", "uploadFile").with("categoria", StringUtil.ifNullEmpty(paramCategoria))
+		LOGGER.info(new StringMapMessage().with("method", "uploadFile")
+				.with("categoria", StringUtil.ifNullEmpty(paramCategoria))
 				.with("descricao", StringUtil.ifNullEmpty(descricao)));
 
 		ParamDTO paramTO = new ParamDTO();
@@ -117,7 +116,7 @@ public class FSController {
 		paramTO.setCodigoCategoria(
 				((paramCategoria == null) || paramCategoria.isEmpty()) ? null : Integer.valueOf(paramCategoria));
 		paramTO.setDescricao(descricao);
-		// paramTO.setUsuario(paramCodigoUsuario);
+		paramTO.setUsuario(paramCodigoUsuario);
 
 		DadosDTO dadosDTO = new DadosDTO();
 		byte[] bytes = IOUtils.toByteArray(file.getInputStream());
@@ -146,7 +145,8 @@ public class FSController {
 	@GetMapping("/union")
 	@ApiOperation("Unir arquivos PDFs")
 	public ResponseEntity<?> unionPDFs(@RequestParam("pdfs") String pdfs, @RequestParam("filename") String filename) {
-		LOGGER.info(new StringMapMessage().with("method", "unionPDFs").with("pdfs", pdfs).with("filename", StringUtil.ifNullEmpty(filename)));
+		LOGGER.info(new StringMapMessage().with("method", "unionPDFs").with("pdfs", pdfs).with("filename",
+				StringUtil.ifNullEmpty(filename)));
 		try {
 			ParamDTO paramTO = ParamDTO.builder().setPdf(pdfs.trim()).setFilename(filename);
 
@@ -164,7 +164,8 @@ public class FSController {
 	public ResponseEntity<?> watermark(@RequestParam(name = "codArq") String arquivo,
 			@RequestParam(name = "texto") String texto,
 			@RequestParam(name = "filename", defaultValue = "") String filename) {
-		LOGGER.info(new StringMapMessage().with("method", "watermark").with("texto", texto).with("filename", StringUtil.ifNullEmpty(filename)));
+		LOGGER.info(new StringMapMessage().with("method", "watermark").with("texto", texto).with("filename",
+				StringUtil.ifNullEmpty(filename)));
 		try {
 			Long codArq = Long.valueOf(arquivo);
 			ParamDTO paramTO = ParamDTO.builder().setId(codArq).setTexto(texto).setFilename(filename)
@@ -175,7 +176,7 @@ public class FSController {
 			HttpHeaders responseHeaders = new HttpHeaders();
 			responseHeaders.set("cod_arq", id.toString());
 			return ResponseEntity.ok().headers(responseHeaders).body(id.toString());
- 
+
 		} catch (Exception e) {
 			LOGGER.error(new StringMapMessage().with("method", "watermark").with("message", e.getMessage()));
 
