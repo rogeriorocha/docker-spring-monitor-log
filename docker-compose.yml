@@ -31,8 +31,13 @@ services:
         
 
   elasticsearch:
-    build: elk/elasticsearch/
-    container_name: elasticsearch
+    build: 
+      context:  elk/elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION    
+    #container_name: elasticsearch
+    volumes:
+      - ./data/es/data:/usr/share/elasticsearch/data
     networks:
       - backend
     ports:
@@ -44,8 +49,11 @@ services:
       org.label-schema.group: "logging"
       
   logstash:
-    build: elk/logstash/
-    container_name: logstash
+    build: 
+      context: elk/logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    #container_name: logstash
     command: -f /etc/logstash/conf.d/
     networks:
       - backend
@@ -61,8 +69,11 @@ services:
       org.label-schema.group: "logging"
 
   kibana:
-    build: elk/kibana/
-    container_name: kibana
+    build: 
+      context: elk/kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    #container_name: kibana
     networks:
       - backend
     volumes:
@@ -94,6 +105,7 @@ services:
     image:  prom/prometheus
     volumes:
       - ./monitor/prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus-data
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     links:
@@ -107,6 +119,8 @@ services:
   
   grafana:
     image:  grafana/grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
 
     links:
       - prometheus
@@ -116,7 +130,10 @@ services:
       - "3000:3000"
     labels:
       org.label-schema.group: "monitoring"        
-    
+
+volumes:
+  prometheus-data:
+  grafana-data:
 
 networks:
   backend:
