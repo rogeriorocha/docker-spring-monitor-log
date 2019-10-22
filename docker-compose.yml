@@ -11,6 +11,12 @@ services:
       - "8080:8080"
     links:
       - logstash
+      
+    environment:
+       SPRING_APPLICATION_JSON: '{
+        "spring.profile.active" : "docker",
+        "spring.datasource.url": "jdbc:mysql://db:3306/table",
+      }'      
 
     healthcheck:
       test: ["CMD", "curl", "-fail", "http://localhost:8080/healthcheck"]

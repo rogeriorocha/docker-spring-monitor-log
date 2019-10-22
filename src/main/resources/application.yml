@@ -9,9 +9,14 @@ spring.security.user:
   roles: ACTUATOR_ADMIN
   
 spring:
-  profiles:
-    active: "dev"
+#  profiles:
+#    active: "dev"
     
+  servlet:
+    multipart:
+      max-file-size: 100MB 
+      max-request-size: 100MB
+      enabled: true    
 
 management:
   endpoints:
@@ -40,11 +45,20 @@ spring:
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     show-sql: true
-          
-  servlet:
-    multipart:
-      max-file-size: 100MB 
-      max-request-size: 100MB
-      enabled: true
+app:
+  storage.location: /store
+  
+---   
+spring:
+  profiles: docker
+  banner:
+    location: banner-docker.txt 
+  datasource:
+    url: jdbc:sqlserver://desesqlbdmg:2002;databaseName=bdseg
+    username: sist_rpsr
+    password: Ho1#h=j4
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: false
 app:
   storage.location: /store
