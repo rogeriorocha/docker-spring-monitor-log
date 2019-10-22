@@ -79,7 +79,7 @@ public class FSService {
 
 			id = arquivoDado.getId();
 
-			LOGGER.trace("appProperties.getStorage()Location", appProperties.getStorage().getLocation());
+			LOGGER.info("appProperties.getStorage()Location", appProperties.getStorage().getLocation());
 			PathUtil file = new PathUtil(id, appProperties.getStorage().getLocation());
 
 			File fileToSave = file.getFile(true);
