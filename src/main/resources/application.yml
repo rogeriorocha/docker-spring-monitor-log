@@ -10,16 +10,23 @@ spring.security.user:
   
 spring:
   profiles:
-    active: "dev"  
+    active: "dev"
+    
 
-# SHUTDOWN ENDPOINT (ShutdownEndpoint)
-management.endpoint: 
-  shutdown.enabled: true
-# HEALTH ENDPOINT
-  health.show-details: always
-# ENDPOINTS WEB CONFIGURATION
-
-
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    metrics:
+      enabled: false
+    prometheus:
+      enabled: true
 
 --- 
 spring:
@@ -39,6 +46,5 @@ spring:
       max-file-size: 100MB 
       max-request-size: 100MB
       enabled: true
-
 app:
-  storage.location: /temp/store
+  storage.location: /store
