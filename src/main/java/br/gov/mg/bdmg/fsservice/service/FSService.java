@@ -1,27 +1,37 @@
 package br.gov.mg.bdmg.fsservice.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.security.auth.login.AppConfigurationEntry;
-
+import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentException;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.gov.mg.bdmg.fsservice.dto.FileDTO;
 import br.gov.mg.bdmg.fsservice.dto.ParamDTO;
 import br.gov.mg.bdmg.fsservice.exception.FileServiceException;
+import br.gov.mg.bdmg.fsservice.exception.FileUtilException;
 import br.gov.mg.bdmg.fsservice.model.ArquivoDado;
 import br.gov.mg.bdmg.fsservice.repository.ArquivoDadoRepository;
 import br.gov.mg.bdmg.fsservice.storage.AppProperties;
+import br.gov.mg.bdmg.fsservice.util.FilePDFUtil;
 import br.gov.mg.bdmg.fsservice.util.FileUtil;
 import br.gov.mg.bdmg.fsservice.util.PathUtil;
+import br.gov.mg.bdmg.fsservice.util.StringUtil;
+import br.gov.mg.bdmg.fsservice.util.base.FileUtilConstants.Util;
 
 @Service
 public class FSService {
@@ -42,14 +52,12 @@ public class FSService {
 
 	@Autowired
 	ArquivoDadoRepository arquivoDadoService;
-	
-	
+
 	@Autowired
 	AppProperties appProperties;
 
 	public Long uploadFile(ParamDTO paramTO) throws FileServiceException, IOException {
 		LOGGER.info("Class: FileServiceBean Method: uploadFile");
-
 
 		ArquivoDado arquivoDadoTemp = null;
 		ArquivoDado arquivoDado = null;
@@ -94,7 +102,7 @@ public class FSService {
 			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
 		}
 		return id;
-		
+
 	}
 
 	/**
@@ -108,70 +116,68 @@ public class FSService {
 	public Long watermarkFile(ParamDTO paramTO) throws FileServiceException, IOException {
 		LOGGER.info("Class: FileServiceBean Method: watermarkFile");
 
-		/* RPSR
-		 * ArquivoDado arquivoDado = null; Long newID = null; try {
-		 * 
-		 * PathUtil pathUtil = new PathUtil(paramTO.getId()); File fileOld =
-		 * pathUtil.getFile(false);
-		 * 
-		 * FileInputStream fis = new FileInputStream(fileOld);
-		 * 
-		 * arquivoDado =
-		 * ArquivoDado.builder().setFlagMigr(ArquivoDado.Flags.MIGR).setAtivo(
-		 * ArquivoDado.Flags.ATIVO) .setCodigoCategoria(CODIGO_CATEGORIA_WATERMARK);
-		 * 
-		 * arquivoDado = arquivoDadoService.save(arquivoDado);
-		 * 
-		 * newID = arquivoDado.getId();
-		 * 
-		 * File fileTmp = File.createTempFile(Util.WATERMARK_ + newID,
-		 * Util.EXTENSAO_PDF);
-		 * 
-		 * FileOutputStream fos = new FileOutputStream(fileTmp);
-		 * 
-		 * FilePDFUtil.insertWaterMark(fis, fos, paramTO.getTexto());
-		 * 
-		 * PathUtil newPath = new PathUtil(newID); File newFile = newPath.getFile(true);
-		 * 
-		 * byte[] file = FileUtil.convertToByteArray(fileTmp);
-		 * 
-		 * String repHash = PathUtil.saveFile(file, newFile);
-		 * 
-		 * arquivoDado.setTamanhoArquivo(newFile.length()).setHash(repHash).setDataIncl(
-		 * new Date()) .setNomeOrigem(getFileName(paramTO.getFilename(), newID))
-		 * .setDescricaoArquivo(Util.WATERMARK +
-		 * paramTO.getId()).setEnderecoArquivo(newFile.getPath());
-		 * 
-		 * arquivoDado = arquivoDadoService.save(arquivoDado);
-		 * 
-		 * fileTmp.delete();
-		 * 
-		 * 
-		 * } catch (FileNotFoundException e) {
-		 * 
-		 * LOGGER.log(Level.SEVERE, e.getMessage(), e);
-		 * 
-		 * throw new FileServiceException(FILENOTFOUNDEXCEPTION + e.getMessage(), e); }
-		 * catch (IOException e) {
-		 * 
-		 * LOGGER.log(Level.SEVERE, e.getMessage(), e); throw new
-		 * FileServiceException(IOEXCEPTION + e.getMessage(), e); } catch
-		 * (ServiceException e) { LOGGER.log(Level.SEVERE, e.getMessage(), e); throw new
-		 * FileServiceException(STOREEXCEPTION + e.getMessage(), e); } catch (Exception
-		 * e) { LOGGER.log(Level.SEVERE, e.getMessage(), e); throw new
-		 * FileServiceException(EXCEPTION + e.getMessage(), e); }
-		 * 
-		 * return newID;
-		 */
-		return Long.valueOf(1);
+		ArquivoDado arquivoDado = null;
+		Long newID = null;
+		try {
+
+			PathUtil pathUtil = new PathUtil(paramTO.getId(), appProperties.getStorage().getLocation());
+			File fileOld = pathUtil.getFile(false);
+
+			FileInputStream fis = new FileInputStream(fileOld);
+
+			arquivoDado = ArquivoDado.builder().setFlagMigr(ArquivoDado.Flags.MIGR).setAtivo(ArquivoDado.Flags.ATIVO)
+					.setCodigoCategoria(CODIGO_CATEGORIA_WATERMARK);
+
+			arquivoDado = arquivoDadoService.save(arquivoDado);
+
+			newID = arquivoDado.getId();
+
+			File fileTmp = File.createTempFile(Util.WATERMARK_ + newID, Util.EXTENSAO_PDF);
+
+			FileOutputStream fos = new FileOutputStream(fileTmp);
+
+			FilePDFUtil.insertWaterMark(fis, fos, paramTO.getTexto());
+
+			PathUtil newPath = new PathUtil(newID, appProperties.getStorage().getLocation());
+			File newFile = newPath.getFile(true);
+
+			byte[] file = FileUtil.convertToByteArray(fileTmp);
+
+			String repHash = PathUtil.saveFile(file, newFile);
+
+			arquivoDado.setTamanhoArquivo(newFile.length()).setHash(repHash).setDataIncl(new Date())
+					.setNomeOrigem(getFileName(paramTO.getFilename(), newID))
+					.setDescricaoArquivo(Util.WATERMARK + paramTO.getId()).setEnderecoArquivo(newFile.getPath());
+
+			arquivoDado = arquivoDadoService.save(arquivoDado);
+
+			fileTmp.delete();
+
+		} catch (FileNotFoundException e) {
+
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+
+			throw new FileServiceException(FILENOTFOUNDEXCEPTION + e.getMessage(), e);
+		} catch (IOException e) {
+
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
+		} catch (ServiceException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new FileServiceException(EXCEPTION + e.getMessage(), e);
+		}
+
+		return newID;
 	}
 
 	private String getFileName(String paramName, Long codigo) {
 		if (paramName != null && !paramName.isEmpty()) {
 			return paramName;
 		}
-		// RPSR return codigo.toString() + Util.EXTENSAO_PDF;
-		return "";
+		return codigo.toString() + Util.EXTENSAO_PDF;
 	}
 
 	public ArquivoDado getById(String id) {
@@ -193,105 +199,133 @@ public class FSService {
 	 */
 	public Long unionPDFFile(ParamDTO paramTO) throws FileServiceException, IOException {
 		LOGGER.info("Class: FileServiceBean Method: unionPDFFile");
-		
-//		RPSR
-//
-//		ArquivoDado arquivoDado = null;
-//
-//		Long codArqNew = null;
-//		try {
-//
-//			String dscArq = Util.UNION
-//					+ (paramTO.getPdf().length() > 200 ? paramTO.getPdf().substring(0, 200) : paramTO.getPdf());
-//
-//			arquivoDado = ArquivoDado.builder().setFlagMigr(ArquivoDado.Flags.MIGR).setAtivo(ArquivoDado.Flags.ATIVO)
-//					.setCodigoCategoria(CODIGO_CATEGORIA_UNION).setDescricaoArquivo(dscArq);
-//
-//			List<String> localFiles = getLocalFiles(paramTO.getPdf());
-//
-//			arquivoDado = arquivoDadoService.save(arquivoDado);
-//
-//			codArqNew = arquivoDado.getId();
-//
-//			File unionFileTmp = File.createTempFile(Util.UNION_ + codArqNew, Util.EXTENSAO_PDF);
-//
-//			FilePDFUtil.unionPDFs(unionFileTmp.getAbsolutePath(), localFiles);
-//
-//			PathUtil pathUtil = new PathUtil(codArqNew);
-//			File novoArquivo = pathUtil.getFile(true);
-//
-//			byte[] file = FileUtil.convertToByteArray(unionFileTmp);
-//
-//			String repHash = PathUtil.saveFile(file, novoArquivo);
-//
-//			arquivoDado.setTamanhoArquivo(novoArquivo.length()).setHash(repHash).setDataIncl(new Date())
-//					.setNomeOrigem(getFileName(paramTO.getFilename(), codArqNew))
-//					.setEnderecoArquivo(novoArquivo.getPath());
-//
-//			arquivoDado = arquivoDadoService.save(arquivoDado);
-//
-//			unionFileTmp.delete();
-//
-//		} catch (FileNotFoundException e) {
-//			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-//			throw new FileServiceException(FILENOTFOUNDEXCEPTION + e.getMessage(), e);
-//		} catch (IOException e) {
-//			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-//			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
-//		} catch (ServiceException e) {
-//			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-//			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
-//		} catch (Exception e) {
-//			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-//			throw new FileServiceException(EXCEPTION + e.getMessage(), e);
-//		}
-//
-//		return codArqNew;
-		
-		return Long.valueOf(1);
+		ArquivoDado arquivoDado = null;
+
+		Long codArqNew = null;
+		try {
+
+			String dscArq = Util.UNION
+					+ (paramTO.getPdf().length() > 200 ? paramTO.getPdf().substring(0, 200) : paramTO.getPdf());
+
+			arquivoDado = ArquivoDado.builder().setFlagMigr(ArquivoDado.Flags.MIGR).setAtivo(ArquivoDado.Flags.ATIVO)
+					.setCodigoCategoria(CODIGO_CATEGORIA_UNION).setDescricaoArquivo(dscArq);
+
+			List<String> localFiles = getLocalFiles(paramTO.getPdf());
+
+			arquivoDado = arquivoDadoService.save(arquivoDado);
+
+			codArqNew = arquivoDado.getId();
+
+			File unionFileTmp = File.createTempFile(Util.UNION_ + codArqNew, Util.EXTENSAO_PDF);
+
+			FilePDFUtil.unionPDFs(unionFileTmp.getAbsolutePath(), localFiles);
+
+			PathUtil pathUtil = new PathUtil(codArqNew, appProperties.getStorage().getLocation());
+			File novoArquivo = pathUtil.getFile(true);
+
+			byte[] file = FileUtil.convertToByteArray(unionFileTmp);
+
+			String repHash = PathUtil.saveFile(file, novoArquivo);
+
+			arquivoDado.setTamanhoArquivo(novoArquivo.length()).setHash(repHash).setDataIncl(new Date())
+					.setNomeOrigem(getFileName(paramTO.getFilename(), codArqNew))
+					.setEnderecoArquivo(novoArquivo.getPath());
+
+			arquivoDado = arquivoDadoService.save(arquivoDado);
+
+			unionFileTmp.delete();
+
+		} catch (FileNotFoundException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new FileServiceException(FILENOTFOUNDEXCEPTION + e.getMessage(), e);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
+		} catch (ServiceException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new FileServiceException(STOREEXCEPTION + e.getMessage(), e);
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw new FileServiceException(EXCEPTION + e.getMessage(), e);
+		}
+
+		return codArqNew;
+
 	}
 
-	private List<String> getLocalFiles(String pdf) {
-		/*
-		 * List<String> localFiles = new ArrayList<String>(); String[] files =
-		 * pdf.split(","); Long id = null;
-		 * 
-		 * try { for (String codigoArquivo : files) { id = Long.valueOf(codigoArquivo);
-		 * PathUtil pathUtil = new PathUtil(id); File file = pathUtil.getFile(false);
-		 * localFiles.add(file.getAbsolutePath()); } } catch (IOException e) { throw new
-		 * IOException("Codigo Arquivo não encontrado: " + id); } return localFiles;
-		 */
-		
-		return new ArrayList<String>();
-		
+	private List<String> getLocalFiles(String pdf) throws IOException {
+
+		List<String> localFiles = new ArrayList<String>();
+		String[] files = pdf.split(",");
+		Long id = null;
+
+		try {
+			for (String codigoArquivo : files) {
+				id = Long.valueOf(codigoArquivo);
+				PathUtil pathUtil = new PathUtil(id, appProperties.getStorage().getLocation());
+				File file = pathUtil.getFile(false);
+				localFiles.add(file.getAbsolutePath());
+			}
+		} catch (IOException e) {
+			throw new IOException("Codigo Arquivo não encontrado: " + id);
+		}
+		return localFiles;
+
 	}
 
-	public byte[] encodeFile(String fromEncode, String toEncode, File file)  {
-		
-
-		
-		return null;
-		
-	}
-
-	public byte[] download(ArquivoDado arquivoDado, String fromEncode, String toEncode) throws IOException {
+	public byte[] encodeFile(String fromEncode, String toEncode, File file) {
 
 		return null;
+
+	}
+	
+
+	private void setDecodingFile(String fromEncode, String toEncode, File file, FileDTO fileTO)
+			throws FileNotFoundException, IOException, FileUtilException {
+		if (StringUtil.nonEmpty(fromEncode)) {
+			InputStream inputStream = new FileInputStream(file);
+
+			byte[] byteFile = IOUtils.toByteArray(inputStream);
+			String decoded = FileUtil.decodedFile(fromEncode, byteFile);
+			if (StringUtil.nonEmpty(toEncode)) {
+				byte[] bsEncoded = FileUtil.encodedFile(toEncode, decoded);
+				fileTO.setFile(bsEncoded);
+			} else {
+				fileTO.setFile(decoded.getBytes());
+			}
+		}
+	}
+	
+
+	public byte[] download(Long id, String fromEncode, String toEncode) throws IOException, FileUtilException {
 		
+		PathUtil pathUtil = new PathUtil(id, appProperties.getStorage().getLocation());
 		
+		File file = pathUtil.getFile(false);
+		
+		FileDTO fileTO = new FileDTO();
+		
+		fileTO.setFile(FileUtil.convertToByteArray(file));
+		//fileTO.setNameFile(arquivoDado.getNomeOrigem());
+
+		setDecodingFile(fromEncode,toEncode, file, fileTO);
+		
+
+		return fileTO.getFileBytes();
+
 	}
 
 	public long expurgar() {
 
-		
-		List<ArquivoDado> lst = arquivoDadoService.findTop10ByAtivoAndDataExpurgoLessThanEqualOrderByDataInclAsc(ArquivoDado.Flags.ATIVO, new Date());
+		List<ArquivoDado> lst = arquivoDadoService
+				.findTop10ByAtivoAndDataExpurgoLessThanEqualOrderByDataInclAsc(ArquivoDado.Flags.ATIVO, new Date());
 
 		for (Iterator<ArquivoDado> it = lst.iterator(); it.hasNext();) {
 			ArquivoDado arquivoDado = it.next();
-			
+
 			arquivoDado.setAtivo(ArquivoDado.Flags.INATIVO);
 			arquivoDadoService.save(arquivoDado);
-			
+
 			System.out.println("DELETE " + arquivoDado.getId());
 		}
 
