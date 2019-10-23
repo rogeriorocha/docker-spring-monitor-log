@@ -46,7 +46,7 @@ spring:
   jpa:
     show-sql: true
 app:
-  storage.location: /store
+  storage.location: /temp/store
   
 ---   
 spring:

@@ -25,6 +25,19 @@ public class PathUtil {
 
 	private String rootPath;
 
+	public void delete() {
+		
+		File rootFolder = new File(rootPath);
+		File file = new File(new File(new File(rootFolder, firstFolder), folder), this.nameFile);
+		File fileHash = new File(new File(new File(rootFolder, firstFolder), folder), this.nameFile+EXTENSAO);
+		
+		if (file.exists())
+			file.delete();
+		
+		if (fileHash.exists())
+			fileHash.delete();
+	}
+
 	public PathUtil(Long id, String rootPath) {
 		this.rootPath = rootPath;
 		String hex = EncryptionUtil.encryptIdArquivo(id.toString());
@@ -34,7 +47,6 @@ public class PathUtil {
 	}
 
 	public File getFile(boolean createIfNotExist) throws IOException {
-		// File rootFolder = new File(appProperties.getStorage().getLocation());
 		File rootFolder = new File(rootPath);
 		File path = new File(new File(rootFolder, firstFolder), folder);
 		if (path.exists()) {

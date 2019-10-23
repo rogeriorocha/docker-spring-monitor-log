@@ -6,6 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -28,10 +31,12 @@ import br.gov.mg.bdmg.fsservice.exception.FileUtilException;
 import br.gov.mg.bdmg.fsservice.model.ArquivoDado;
 import br.gov.mg.bdmg.fsservice.repository.ArquivoDadoRepository;
 import br.gov.mg.bdmg.fsservice.storage.AppProperties;
+import br.gov.mg.bdmg.fsservice.util.EncryptionUtil;
 import br.gov.mg.bdmg.fsservice.util.FilePDFUtil;
 import br.gov.mg.bdmg.fsservice.util.FileUtil;
 import br.gov.mg.bdmg.fsservice.util.PathUtil;
 import br.gov.mg.bdmg.fsservice.util.StringUtil;
+import br.gov.mg.bdmg.fsservice.util.base.FileUtilConstants;
 import br.gov.mg.bdmg.fsservice.util.base.FileUtilConstants.Util;
 
 @Service
@@ -328,14 +333,49 @@ public class FSService {
 
 		for (Iterator<ArquivoDado> it = lst.iterator(); it.hasNext();) {
 			ArquivoDado arquivoDado = it.next();
+			
+			PathUtil pathUtil = new PathUtil(arquivoDado.getId(), appProperties.getStorage().getLocation());
+			pathUtil.delete();
 
 			arquivoDado.setAtivo(ArquivoDado.Flags.INATIVO);
 			arquivoDadoService.save(arquivoDado);
+			
 
 			System.out.println("DELETE " + arquivoDado.getId());
 		}
 
 		return lst.size();
+	}
+
+	public void healthcheck() throws Exception {
+		
+		File file = new File(appProperties.getStorage().getLocation(), "helthcheck.txt");
+		
+		if (!file.exists()) {
+			LOGGER.error("healthcheck file helthcheck.txt not found!");
+			throw new Exception("healthcheck file helthcheck.txt not found!");
+		}
+		
+		/*
+		MessageDigest digest = MessageDigest.getInstance(FileUtilConstants.CryptographicHash.MD5);
+		
+		digest.update("ONLY HEATHCHCK TEST - NO CHANGE NEVER".getBytes(StandardCharsets.UTF_8));
+		
+		byte[] hashedBytes = digest.digest();
+		
+		String hashMD5 = EncryptionUtil.toHex(hashedBytes);
+		*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 }
