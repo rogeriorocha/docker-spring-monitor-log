@@ -1,15 +1,21 @@
-#FROM java:8 
+FROM maven:3.5-jdk-8-alpine AS build
+
+WORKDIR /code
+
+COPY pom.xml /code/pom.xml
+#RUN ["mvn", "dependency:resolve"]
+#RUN ["mvn", "verify"]
+
+# Adding source, compile and package into a fat jar
+COPY ["src/main", "/code/src/main"]
+RUN ["mvn", "package"]
+
+#FROM openjdk:8-jre-alpine
 FROM openjdk:8-jdk
 
 
-# Install maven
-RUN apt-get update  
-RUN apt-get install -y maven
+COPY --from=build /code/target/fs-service-0.0.1-SNAPSHOT.jar /
 
-# Adding springboot-elk app to container
-ADD . /usr/config-client  
-WORKDIR /usr/config-client
-#RUN ["mvn", "package"]
+CMD ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-jar", "/fs-service-0.0.1-SNAPSHOT.jar"]
 
-EXPOSE 8080 
-CMD ["/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-jar", "target/fs-service-0.0.1-SNAPSHOT.jar"]
+EXPOSE 8080

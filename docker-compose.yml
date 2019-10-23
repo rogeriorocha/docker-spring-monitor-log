@@ -3,7 +3,9 @@ version: '3.3'
 services:
   app:
     #build: .
-    image: rogeriosilvarocha/fs-service:latest
+    #restart: always
+    build:
+      context: .     
     labels:
       filebeat_enable:
     networks:
@@ -24,7 +26,7 @@ services:
       - ./data/app/store:/store      
 
     healthcheck:
-      test: ["CMD", "curl", "-fail", "http://localhost:8080/healthcheck"]
+      test: ["CMD", "curl", "-fail", "http://localhost:8080/api/v1/healthcheck"]
       interval: 10s
       timeout: 10s
       retries: 3
