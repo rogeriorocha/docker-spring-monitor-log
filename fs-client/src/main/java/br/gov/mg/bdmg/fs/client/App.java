@@ -1,0 +1,30 @@
+package br.gov.mg.bdmg.fs.client;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.context.annotation.Bean;
+
+@SpringBootApplication
+@EnableFeignClients
+public class App {
+
+	public static void main(String[] args) {
+		SpringApplication.run(App.class, args);
+	}
+
+	@Bean
+	public CommandLineRunner run(ViaCEPClient client) {
+		return args -> {
+			//if (args.length > 0) {
+				String cep = "33805590";
+
+				Endereco endereco = client.buscaEnderecoPor(cep);
+
+				System.out.println(endereco);
+			//}
+		};
+	}
+
+}
