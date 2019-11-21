@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import br.gov.mg.bdmg.fs.dto.InfoResource;
 
-@FeignClient(url="http://localhost:8080/", name = "viacep")
+@FeignClient(url="http://lxdocker:8080/", name = "viacep")
 public interface FSClient {
  
-    @GetMapping("api/v1/filename/{id}")
+    @GetMapping("api/v1/info/{id}")
     InfoResource getData(@PathVariable("id") Long id);
 }
