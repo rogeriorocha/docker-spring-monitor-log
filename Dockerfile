@@ -7,14 +7,14 @@ COPY pom.xml /code/pom.xml
 #RUN ["mvn", "verify"]
 
 # Adding source, compile and package into a fat jar
-COPY ["src/main", "/code/src/main"]
+COPY ["./", "/code/"]
 RUN ["mvn", "package"]
 
 #FROM openjdk:8-jre-alpine
 FROM openjdk:8-jdk
 
 
-COPY --from=build /code/target/fs-service-0.0.1-SNAPSHOT.jar /
+COPY --from=build /code/fs-service/target/fs-service-0.0.1-SNAPSHOT.jar /
 
 CMD ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-jar", "/fs-service-0.0.1-SNAPSHOT.jar"]
 
