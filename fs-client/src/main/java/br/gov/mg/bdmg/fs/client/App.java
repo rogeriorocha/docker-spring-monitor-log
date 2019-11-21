@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
+import br.gov.mg.bdmg.fs.dto.InfoResource;
+
 @SpringBootApplication
 @EnableFeignClients
 public class App {
@@ -15,15 +17,13 @@ public class App {
 	}
 
 	@Bean
-	public CommandLineRunner run(ViaCEPClient client) {
+	public CommandLineRunner run(FSClient client) {
 		return args -> {
-			//if (args.length > 0) {
-				String cep = "33805590";
 
-				Endereco endereco = client.buscaEnderecoPor(cep);
+				InfoResource dto = client.getData(Long.valueOf(4490477));
 
-				System.out.println(endereco);
-			//}
+				System.out.println(dto.toString());
+
 		};
 	}
 

@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.gov.mg.bdmg.fs.dto.DadosDTO;
-import br.gov.mg.bdmg.fs.dto.FileDataResponseDTO;
+import br.gov.mg.bdmg.fs.dto.InfoResource;
 import br.gov.mg.bdmg.fs.dto.ParamDTO;
 import br.gov.mg.bdmg.fs.exception.FileServiceException;
 import br.gov.mg.bdmg.fs.exception.FileUtilException;
@@ -90,9 +90,9 @@ public class FSController {
 
 	}
 
-	@GetMapping("/filename/{ID}")
+	@GetMapping("/info/{ID}")
 	@ApiOperation("retorna nome do arquivo")
-	public ResponseEntity<FileDataResponseDTO> getNameFileById(@PathVariable("ID") String id) {
+	public ResponseEntity<InfoResource> getNameFileById(@PathVariable("ID") String id) {
 		LOGGER.info(new StringMapMessage().with("method", "getNameFileById").with("id", id));
 
 		try {
@@ -100,7 +100,11 @@ public class FSController {
 
 			Validate.notNull(arquivoDado, "id " + id + " nao encontrado!");
 			
-			FileDataResponseDTO e = new FileDataResponseDTO();
+			InfoResource e = new InfoResource();
+			
+			e.setId(arquivoDado.getId());
+			e.setHash(arquivoDado.getHash());
+			e.setAtivo(arquivoDado.getAtivo());
 			e.setFilename(arquivoDado.getNomeOrigem());
 
 			return ResponseEntity.ok().header("filename", arquivoDado.getNomeOrigem())
