@@ -10,6 +10,15 @@ public class InfoResource implements Serializable {
 	private Long id;
 	private String hash;
 	private String ativo;
+	private String errorMessage;
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
 
 	public Long getId() {
 		return id;
@@ -45,7 +54,7 @@ public class InfoResource implements Serializable {
 	
 	@Override
     public String toString() {
-        return "FileDataResponseDTO {" +
+        return "InfoResource {" +
                 "id='" + id + '\'' +
                 ", filename='" + filename + '\'' +
                 ", hash='" + hash + '\'' +

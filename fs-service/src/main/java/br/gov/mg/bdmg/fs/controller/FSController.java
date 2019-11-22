@@ -27,8 +27,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.gov.mg.bdmg.fs.dto.DadosDTO;
+import br.gov.mg.bdmg.fs.dto.ExpurgoResource;
 import br.gov.mg.bdmg.fs.dto.InfoResource;
 import br.gov.mg.bdmg.fs.dto.ParamDTO;
+import br.gov.mg.bdmg.fs.dto.UnionResource;
+import br.gov.mg.bdmg.fs.dto.UploadResource;
 import br.gov.mg.bdmg.fs.exception.FileServiceException;
 import br.gov.mg.bdmg.fs.exception.FileUtilException;
 import br.gov.mg.bdmg.fs.model.ArquivoDado;
@@ -43,13 +46,12 @@ public class FSController {
 
 	@Autowired
 	FSService fileService;
-	
+
 	@GetMapping("/")
 	@ApiOperation("test")
-	public String test(){
-		return "Hello JUnit 5";	
+	public String test() {
+		return "Hello JUnit 5";
 	}
-	 
 
 	@GetMapping("/download/{ID}")
 	@ApiOperation("Download do arquivo")
@@ -95,59 +97,66 @@ public class FSController {
 	public ResponseEntity<InfoResource> getNameFileById(@PathVariable("ID") String id) {
 		LOGGER.info(new StringMapMessage().with("method", "getNameFileById").with("id", id));
 
+		InfoResource e = new InfoResource();
 		try {
 			ArquivoDado arquivoDado = fileService.getById(id);
 
 			Validate.notNull(arquivoDado, "id " + id + " nao encontrado!");
-			
-			InfoResource e = new InfoResource();
-			
+
 			e.setId(arquivoDado.getId());
 			e.setHash(arquivoDado.getHash());
 			e.setAtivo(arquivoDado.getAtivo());
 			e.setFilename(arquivoDado.getNomeOrigem());
 
-			return ResponseEntity.ok().header("filename", arquivoDado.getNomeOrigem())
-					.body(e);
-		} catch (Exception e) {
-			LOGGER.error(new StringMapMessage().with("method", "getNameFileById").with("message", e.getMessage()));
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+			return ResponseEntity.ok().header("filename", arquivoDado.getNomeOrigem()).body(e);
+		} catch (Exception er) {
+			LOGGER.error(new StringMapMessage().with("method", "getNameFileById").with("message", er.getMessage()));
+			e.setErrorMessage(er.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
 		}
 	}
 
 	@PostMapping("/upload")
 	@ApiOperation("Realizar upload de arquivo")
-	public Map<String, Object> uploadFile(
+	public ResponseEntity<UploadResource> uploadFile(
 			@RequestParam(name = "categoria", required = false, defaultValue = "") String paramCategoria,
 			@RequestParam(name = "descricao", required = false) String descricao,
 			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
 			@RequestHeader(value = "x-coduser", required = false, defaultValue = "") String paramCodigoUsuario)
 			throws FileServiceException, IOException {
 
-		LOGGER.info(new StringMapMessage().with("method", "uploadFile")
-				.with("categoria", StringUtil.ifNullEmpty(paramCategoria))
-				.with("descricao", StringUtil.ifNullEmpty(descricao)));
+		UploadResource r = new UploadResource();
+		try {
 
-		ParamDTO paramTO = new ParamDTO();
+			LOGGER.info(new StringMapMessage().with("method", "uploadFile")
+					.with("categoria", StringUtil.ifNullEmpty(paramCategoria))
+					.with("descricao", StringUtil.ifNullEmpty(descricao)));
 
-		paramTO.setCodigoCategoria(
-				((paramCategoria == null) || paramCategoria.isEmpty()) ? null : Integer.valueOf(paramCategoria));
-		paramTO.setDescricao(descricao);
-		paramTO.setUsuario(paramCodigoUsuario);
+			ParamDTO paramTO = new ParamDTO();
 
-		DadosDTO dadosDTO = new DadosDTO();
-		byte[] bytes = IOUtils.toByteArray(file.getInputStream());
-		dadosDTO.setInputStream(bytes);
-		dadosDTO.setFileName(file.getOriginalFilename());
+			paramTO.setCodigoCategoria(
+					((paramCategoria == null) || paramCategoria.isEmpty()) ? null : Integer.valueOf(paramCategoria));
+			paramTO.setDescricao(descricao);
+			paramTO.setUsuario(paramCodigoUsuario);
 
-		paramTO.setDadosTO(dadosDTO);
+			DadosDTO dadosDTO = new DadosDTO();
+			byte[] bytes = IOUtils.toByteArray(file.getInputStream());
+			dadosDTO.setInputStream(bytes);
+			dadosDTO.setFileName(file.getOriginalFilename());
 
-		long id = fileService.uploadFile(paramTO);
+			paramTO.setDadosTO(dadosDTO);
 
-		HashMap<String, Object> map = new HashMap<>();
+			long id = fileService.uploadFile(paramTO);
 
-		map.put("id", Long.valueOf(id));
-		return map;
+			r.setId(id);
+
+			return ResponseEntity.ok().body(r);
+		} catch (Exception e) {
+			LOGGER.error(new StringMapMessage().with("method", "getNameFileById").with("message", e.getMessage()));
+			r.setErrorMessage(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(r);
+		}
+
 	}
 
 	@GetMapping("/healthcheck")
@@ -159,32 +168,46 @@ public class FSController {
 
 	@PostMapping("/union")
 	@ApiOperation("Unir arquivos PDFs")
-	public ResponseEntity<?> unionPDFs(@RequestParam("pdfs") String pdfs, @RequestParam("filename") String filename) {
+	public ResponseEntity<UnionResource> unionPDFs(@RequestParam("pdfs") String pdfs,
+			@RequestParam("filename") String filename) {
 		LOGGER.info(new StringMapMessage().with("method", "unionPDFs").with("pdfs", pdfs).with("filename",
 				StringUtil.ifNullEmpty(filename)));
+		UnionResource r = new UnionResource();
 		try {
 			ParamDTO paramTO = ParamDTO.builder().setPdf(pdfs.trim()).setFilename(filename);
 
 			Long id = fileService.unionPDFFile(paramTO);
 
-			return ResponseEntity.ok().header("cod_arq", id.toString()).body(id.toString());
+			r.setId(id);
+
+			return ResponseEntity.ok().header("cod_arq", id.toString()).body(r);
 		} catch (Exception e) {
+
 			LOGGER.error(new StringMapMessage().with("method", "unionPDFs").with("message", e.getMessage()));
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+			r.setErrorMessage(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(r);
 		}
 	}
 
-	
 	@DeleteMapping("/expurgar")
 	@ApiOperation("Expurga arquivos marcados")
-	public ResponseEntity<Long> expurgar(){
-		Long rows = fileService.expurgar();
-		
-		return ResponseEntity.ok().body(rows);
+	public ResponseEntity<ExpurgoResource> expurgar() {
+
+		ExpurgoResource r = new ExpurgoResource();
+		try {
+			r.setQtdeDeletada(fileService.expurgar());
+
+			return ResponseEntity.ok().body(r);
+
+		} catch (Exception e) {
+			LOGGER.error(new StringMapMessage().with("method", "expurgar").with("message", e.getMessage()));
+			r.setErrorMessage(e.getMessage());
+
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(r);
+		}
+
 	}
-	
-	
-	
+
 	@PostMapping("/watermark")
 	@ApiOperation("Marca d'agua em arquivos PDFs")
 	public ResponseEntity<?> watermark(@RequestParam(name = "codArq") String arquivo,

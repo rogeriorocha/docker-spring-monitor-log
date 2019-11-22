@@ -12,9 +12,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>fs-dto</name>
 	<url>http://maven.apache.org</url>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version> 
 	</properties>
+
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

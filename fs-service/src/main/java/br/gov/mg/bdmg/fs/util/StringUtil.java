@@ -161,7 +161,7 @@ public abstract class StringUtil {
 	 * @param decimal
 	 * @return
 	 */
-	private static Number parseCompleteString(String input) {
+	public static Number parseCompleteString(String input) {
 
 		ParsePosition pp = new ParsePosition(0);
 		NumberFormat numberFormat = NumberFormat.getInstance(LOCALE_BRASIL);

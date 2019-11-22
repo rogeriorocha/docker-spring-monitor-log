@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.StringMapMessage;
@@ -37,9 +36,8 @@ import br.gov.mg.bdmg.fs.util.base.FileUtilConstants.Util;
 
 @Service
 public class FSService {
-	
-	private final Logger LOGGER = LogManager.getLogger(this.getClass());
 
+	private final Logger LOGGER = LogManager.getLogger(this.getClass());
 
 	private static final String IOEXCEPTION = "[IOEXCEPTION] ";
 	private static final String EXCEPTION = "[EXCEPTION] ";
@@ -101,9 +99,9 @@ public class FSService {
 			}
 			throw new FileServiceException(IOEXCEPTION + e.getMessage(), e);
 		} catch (Throwable e) {
-			
+
 			LOGGER.error(e.getMessage());
-					
+
 			if (arquivoDado != null) {
 				arquivoDadoRpository.delete(arquivoDado);
 			}
@@ -241,7 +239,7 @@ public class FSService {
 			unionFileTmp.delete();
 
 		} catch (FileNotFoundException e) {
-			
+
 			LOGGER.error(new StringMapMessage().with("error", FILENOTFOUNDEXCEPTION + e.getMessage()));
 			throw new FileServiceException(FILENOTFOUNDEXCEPTION + e.getMessage(), e);
 		} catch (IOException e) {
@@ -273,7 +271,8 @@ public class FSService {
 				localFiles.add(file.getAbsolutePath());
 			}
 		} catch (IOException e) {
-			LOGGER.error(new StringMapMessage().with("error", "Codigo Arquivo não encontrado: " + id + " "+e.getMessage() ));
+			LOGGER.error(new StringMapMessage().with("error",
+					"Codigo Arquivo não encontrado: " + id + " " + e.getMessage()));
 			throw new IOException("Codigo Arquivo não encontrado: " + id);
 		}
 		return localFiles;
@@ -285,7 +284,6 @@ public class FSService {
 		return null;
 
 	}
-	
 
 	private void setDecodingFile(String fromEncode, String toEncode, File file, FileDTO fileTO)
 			throws FileNotFoundException, IOException, FileUtilException {
@@ -302,21 +300,19 @@ public class FSService {
 			}
 		}
 	}
-	
 
 	public byte[] download(Long id, String fromEncode, String toEncode) throws IOException, FileUtilException {
-		
-		PathUtil pathUtil = new PathUtil(id, appProperties.getStorage().getLocation());
-		
-		File file = pathUtil.getFile(false);
-		
-		FileDTO fileTO = new FileDTO();
-		
-		fileTO.setFile(FileUtil.convertToByteArray(file));
-		//fileTO.setNameFile(arquivoDado.getNomeOrigem());
 
-		setDecodingFile(fromEncode,toEncode, file, fileTO);
-		
+		PathUtil pathUtil = new PathUtil(id, appProperties.getStorage().getLocation());
+
+		File file = pathUtil.getFile(false);
+
+		FileDTO fileTO = new FileDTO();
+
+		fileTO.setFile(FileUtil.convertToByteArray(file));
+		// fileTO.setNameFile(arquivoDado.getNomeOrigem());
+
+		setDecodingFile(fromEncode, toEncode, file, fileTO);
 
 		return fileTO.getFileBytes();
 
@@ -329,13 +325,12 @@ public class FSService {
 
 		for (Iterator<ArquivoDado> it = lst.iterator(); it.hasNext();) {
 			ArquivoDado arquivoDado = it.next();
-			
+
 			PathUtil pathUtil = new PathUtil(arquivoDado.getId(), appProperties.getStorage().getLocation());
 			pathUtil.delete();
 
 			arquivoDado.setAtivo(ArquivoDado.Flags.INATIVO);
 			arquivoDadoRpository.save(arquivoDado);
-			
 
 			System.out.println("DELETE " + arquivoDado.getId());
 		}
@@ -344,34 +339,14 @@ public class FSService {
 	}
 
 	public void healthcheck() throws Exception {
-		
+
 		File file = new File(appProperties.getStorage().getLocation(), "helthcheck.txt");
-		
+
 		if (!file.exists()) {
 			LOGGER.error("healthcheck file helthcheck.txt not found!");
 			throw new Exception("healthcheck file helthcheck.txt not found!");
 		}
-		
-		/*
-		MessageDigest digest = MessageDigest.getInstance(FileUtilConstants.CryptographicHash.MD5);
-		
-		digest.update("ONLY HEATHCHCK TEST - NO CHANGE NEVER".getBytes(StandardCharsets.UTF_8));
-		
-		byte[] hashedBytes = digest.digest();
-		
-		String hashMD5 = EncryptionUtil.toHex(hashedBytes);
-		*/
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 	}
 
 }
