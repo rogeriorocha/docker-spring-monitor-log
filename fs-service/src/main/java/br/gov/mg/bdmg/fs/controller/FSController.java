@@ -31,7 +31,7 @@ import br.gov.mg.bdmg.fs.dto.ExpurgoResource;
 import br.gov.mg.bdmg.fs.dto.InfoResource;
 import br.gov.mg.bdmg.fs.dto.ParamDTO;
 import br.gov.mg.bdmg.fs.dto.UnionResource;
-import br.gov.mg.bdmg.fs.dto.UploadResource;
+import br.gov.mg.bdmg.fs.dto.UploadResponseResource;
 import br.gov.mg.bdmg.fs.exception.FileServiceException;
 import br.gov.mg.bdmg.fs.exception.FileUtilException;
 import br.gov.mg.bdmg.fs.model.ArquivoDado;
@@ -118,14 +118,14 @@ public class FSController {
 
 	@PostMapping("/upload")
 	@ApiOperation("Realizar upload de arquivo")
-	public ResponseEntity<UploadResource> uploadFile(
+	public ResponseEntity<UploadResponseResource> uploadFile(
 			@RequestParam(name = "categoria", required = false, defaultValue = "") String paramCategoria,
 			@RequestParam(name = "descricao", required = false) String descricao,
 			@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
 			@RequestHeader(value = "x-coduser", required = false, defaultValue = "") String paramCodigoUsuario)
 			throws FileServiceException, IOException {
 
-		UploadResource r = new UploadResource();
+		UploadResponseResource r = new UploadResponseResource();
 		try {
 
 			LOGGER.info(new StringMapMessage().with("method", "uploadFile")

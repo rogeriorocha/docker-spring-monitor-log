@@ -2,7 +2,7 @@ package br.gov.mg.bdmg.fs.dto;
 
 import java.io.Serializable;
 
-public class UploadResource implements Serializable {
+public class UploadResponseResource implements Serializable {
 
 
 	private static final long serialVersionUID = 6940615026678285512L;
