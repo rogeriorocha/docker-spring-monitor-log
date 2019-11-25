@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import br.gov.mg.bdmg.fs.dto.InfoResource;
 import br.gov.mg.bdmg.fs.dto.UploadResponseResource;
 
-@FeignClient(url = "http://lxdocker:8080/", name = "fs", path = "/api/")
+@FeignClient(url = "${client.service.url}", name = "fs", path = "/api/")
 public interface FSClient {
 
 	@GetMapping("/v1/info/{id}")

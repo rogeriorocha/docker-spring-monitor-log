@@ -1,2 +1,7 @@
 server:
   port : 8081
+  
+client:
+  service:
+    url: "http://lxdocker:8080/"   
+  
