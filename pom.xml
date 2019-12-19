@@ -22,12 +22,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
     </properties>
-
+ 
      
 
     <modules>
         <module>fs-dto</module>
         <module>fs-client</module>
+        <module>fs-use-client-sample</module>        
         <module>fs-model</module>
         <module>fs-service</module>
     </modules>

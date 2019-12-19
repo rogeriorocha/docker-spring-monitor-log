@@ -1,8 +1,6 @@
 package br.gov.mg.bdmg.fs.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;

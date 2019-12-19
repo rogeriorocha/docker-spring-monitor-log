@@ -3,5 +3,5 @@ server:
   
 client:
   service:
-    url: "http://lxdocker:8080/"   
+    url: "http://lxdocker:8080/"
   
