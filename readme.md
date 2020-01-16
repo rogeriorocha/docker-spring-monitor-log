@@ -7,10 +7,10 @@ ELK
 
 
 
-if(doc['params.servico.tempoGasto'].value == null) {
+if(doc['params.exec.tempoGastoMS'].value == null) {
   return ''
 } else {
-  return doc['params.servico.tempoGasto'].value
+  return doc['params.exec.tempoGastoMS'].value
 }
 
 
