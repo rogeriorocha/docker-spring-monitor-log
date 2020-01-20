@@ -1,6 +1,9 @@
 package br.gov.mg.bdmg.fs.controller;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -48,7 +51,12 @@ public class FSController {
 	@GetMapping("/")
 	@ApiOperation("test")
 	public String test() {
-		return "Hello JUnit 5";
+		try {
+			return "Hello "+ new Date()+ " "+InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return "Hello "+ new Date();
+		}
 	}
 
 	@GetMapping("/download/{ID}")
