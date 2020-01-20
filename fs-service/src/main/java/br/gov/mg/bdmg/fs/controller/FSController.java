@@ -47,15 +47,25 @@ public class FSController {
 
 	@Autowired
 	FSService fileService;
+ 
+	@GetMapping("/stress")
+	@ApiOperation("stress")
+	public String stress() {
+		double x = 0.0001;
+		for (int i = 0; i <= 1000000; i++) {
+		    x += Math.sqrt(x);
+		  }
+		  return "OK!";		
+	}
 
 	@GetMapping("/")
 	@ApiOperation("test")
 	public String test() {
 		try {
-			return "Hello "+ new Date()+ " "+InetAddress.getLocalHost();
+			return "Hello " + new Date() + " " + InetAddress.getLocalHost();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-			return "Hello "+ new Date();
+			return "Hello " + new Date();
 		}
 	}
 
