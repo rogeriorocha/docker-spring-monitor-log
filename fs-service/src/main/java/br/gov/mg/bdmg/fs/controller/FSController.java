@@ -41,7 +41,7 @@ import br.gov.mg.bdmg.fs.util.StringUtil;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/fs")
 public class FSController {
 	private final Logger LOGGER = LogManager.getLogger(this.getClass());
 

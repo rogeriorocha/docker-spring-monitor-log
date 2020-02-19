@@ -9,8 +9,8 @@ spring.security.user:
   roles: ACTUATOR_ADMIN
   
 spring:
-#  profiles:
-#    active: "dev"
+  profiles:
+    active: "dev"
     
   servlet:
     multipart:
